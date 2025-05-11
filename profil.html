@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mon Profil</title>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <h1>Mes Résultats</h1>
+  <button onclick="logout()">Déconnexion</button>
+  <ul id="resultsList"></ul>
+
+  <script>
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        firebase.firestore().collection("results")
+          .where("uid", "==", user.uid)
+          .orderBy("date", "desc")
+          .get()
+          .then(snapshot => {
+            const list = document.getElementById("resultsList");
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              const li = document.createElement("li");
+              li.textContent = `Score: ${data.score} - ${new Date(data.date.toDate()).toLocaleString()}`;
+              list.appendChild(li);
+            });
+          });
+      } else {
+        alert("Veuillez vous connecter");
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>
